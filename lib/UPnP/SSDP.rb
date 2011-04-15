@@ -581,7 +581,7 @@ class UPnP::SSDP
     socket.setsockopt Socket::IPPROTO_IP, Socket::IP_MULTICAST_TTL, ttl
     socket.setsockopt Socket::IPPROTO_IP, Socket::IP_TTL, ttl
 
-    socket.bind '0.0.0.0', @port
+    socket.bind '0.0.0.0', 0
 
     socket
   end
