@@ -267,7 +267,8 @@ class UPnP::Control::Service
   # Handles this service's actions
 
   def method_missing(message, *arguments)
-    return super unless respond_to? message
+# ???
+#    return super unless respond_to? message
 
     begin
       @driver.send(message, *arguments)
@@ -325,6 +326,9 @@ class UPnP::Control::Service
   def parse_actions(action_list)
     @actions = {}
 
+    if action_list == nil
+      return
+    end
     action_list.css('action').each do |action|
       name = action.at('name').text.strip
 

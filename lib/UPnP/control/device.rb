@@ -116,7 +116,7 @@ class UPnP::Control::Device
 
   def self.create(device_url)
     description = Nokogiri::XML open(device_url)
-    url = device_url + '/'
+    url = device_url + './'
 
     type = description.at('root > device > deviceType').text
     klass_name = type.sub(/#{UPnP::DEVICE_SCHEMA_PREFIX}:([^:]+):.*/, '\1')
@@ -167,7 +167,7 @@ class UPnP::Control::Device
       description = Nokogiri::XML open(device)
 
       @url = description.at 'root > URLBase'
-      @url = @url ? URI.parse(@url.text.strip) : device + '/'
+      @url = @url ? URI.parse(@url.text.strip) : device + './'
 
       device = parse_device description.at('root > device')
     when Nokogiri::XML::Element then
