@@ -1,7 +1,7 @@
-$KCODE = 'u'
+#$KCODE = 'u'
 
 require 'rubygems'
-gem 'soap4r'
+gem 'soap4r-ruby1.9'
 
 ##
 # An implementation of the Universal Plug and Play protocol.
