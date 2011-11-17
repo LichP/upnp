@@ -10,6 +10,7 @@ Hoe.spec 'UPnP' do
   developer 'Eric Hodel', 'drbrain@segment7.net'
 
   extra_deps << ['nokogiri', '~> 1.3']
+  extra_deps << ['uuid', '>=2.3.4']
   extra_deps << ['soap4r-ruby1.9', '>= 2.0']
 end
 
