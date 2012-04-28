@@ -281,26 +281,32 @@ class UPnP::SSDP
 
     attr_reader :wait_time
 
+    attr_reader :host
+
+    attr_reader :port
+
     ##
     # Creates a new Search by parsing the text in +response+
 
-    def self.parse(response)
+    def self.parse(response, hostname, port)
       response =~ /^mx:\s*(\d+)/i
       wait_time = Integer $1
 
       response =~ /^st:\s*(\S*)/i
       target = $1.strip
 
-      new Time.now, target, wait_time
+      new Time.now, target, wait_time, hostname, port
     end
 
     ##
     # Creates a new Search
 
-    def initialize(date, target, wait_time)
+    def initialize(date, target, wait_time, host, port)
       @date = date
       @target = target
       @wait_time = wait_time
+      @host = host
+      @port = port
     end
 
     ##
@@ -447,7 +453,7 @@ class UPnP::SSDP
         next unless Search === search
 
         case search.target
-        when /^#{UPnP::DEVICE_SCHEMA_PREFIX}/ then
+        when /^#{UPnP::DEVICE_SCHEMA_PREFIX}|ssdp:all/ then
           devices = root_device.devices.select do |d|
             d.type_urn == search.target
           end
@@ -455,13 +461,13 @@ class UPnP::SSDP
           devices.each do |d|
             hosts.each do |host|
               uri = "http://#{host}:#{port}/description"
-              send_response uri, search.target, "#{d.name}::#{search.target}", d
+              send_response uri, search.target, "#{d.name}::#{search.target}", d, search.host, search.port
             end
           end
         when 'upnp:rootdevice' then
           hosts.each do |host|
             uri = "http://#{host}:#{port}/description"
-            send_response uri, search.target, search.target, root_device
+            send_response uri, search.target, search.target, root_device, search.host, search.port
           end
         else
           warn "Unhandled target #{search.target}"
@@ -540,7 +546,7 @@ class UPnP::SSDP
         response, (family, port, hostname, address) = @socket.recvfrom 1024
 
         begin
-          adv = parse response
+          adv = parse response, hostname, port
 
           info = case adv
                  when Notification then adv.type
@@ -581,7 +587,7 @@ class UPnP::SSDP
     socket.setsockopt Socket::IPPROTO_IP, Socket::IP_MULTICAST_TTL, ttl
     socket.setsockopt Socket::IPPROTO_IP, Socket::IP_TTL, ttl
 
-    socket.bind '0.0.0.0', 0
+    socket.bind '0.0.0.0', @port
 
     socket
   end
@@ -589,14 +595,14 @@ class UPnP::SSDP
   ##
   # Returns a Notification, Response or Search created from +response+.
 
-  def parse(response)
+  def parse(response, hostname, port)
     case response
     when /\ANOTIFY/ then
       Notification.parse response
     when /\AHTTP/ then
       Response.parse response
     when /\AM-SEARCH/ then
-      Search.parse response
+      Search.parse response, hostname, port
     else
       raise Error, "Unknown response #{response[/\A.*$/]}"
     end
@@ -712,7 +718,7 @@ USN: #{name}\r
   ##
   # Builds and sends a response to an M-SEARCH request"
 
-  def send_response(uri, type, name, device)
+  def send_response(uri, type, name, device, host, port)
     server_info = "Ruby UPnP/#{UPnP::VERSION}"
     device_info = "#{device.root_device.class}/#{device.root_device.version}"
 
@@ -731,7 +737,7 @@ Content-Length: 0\r
 
     log :debug, "SSDP sent M-SEARCH OK #{type}"
 
-    @socket.send http_response, 0, @broadcast, @port
+    @socket.send http_response, 0, host, port
   end
 
   ##
