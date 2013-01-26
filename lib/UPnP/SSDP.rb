@@ -467,7 +467,7 @@ class UPnP::SSDP
         when 'upnp:rootdevice' then
           hosts.each do |host|
             uri = "http://#{host}:#{port}/description"
-            send_response uri, search.target, search.target, root_device, search.host, search.port
+            send_response uri, search.target, "#{root_device.name}::#{search.target}", root_device, search.host, search.port
           end
         else
           warn "Unhandled target #{search.target}"
