@@ -434,7 +434,7 @@ class UPnP::Device
   # from the root device.
 
   def advertise
-    @hosts = Socket.ip_address_list.map { |addrinfo| addrinfo.ip_address}.reject{ |addr| addr =~ /^127.0|^::1/ }
+    @hosts = Socket.ip_address_list.map{ |addrinfo| addrinfo.ip_address }.reject{ |addr| addr =~ /^127\.0|^::1|^[^\d]/ }
 
     @advertise_thread = Thread.start do
       Thread.abort_on_exception = true
