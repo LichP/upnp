@@ -73,8 +73,6 @@ module UPnP
 
   class TestCase < Test::Unit::TestCase
 
-    undef_method :default_test
-
     def setup
       @tempdir = File.join Dir.tmpdir, "test_UPnP_#{$$}"
       FileUtils.mkdir_p @tempdir
