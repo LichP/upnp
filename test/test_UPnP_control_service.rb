@@ -86,7 +86,7 @@ class TestUPnPControlService < UPnP::TestCase
   def test_create_driver
     service = UPnP::Control::Service.create @service_description, @url
 
-    assert_equal @methods, service.driver.methods(false).sort
+    assert_equal @methods, service.driver.methods(false).map{|m| m.to_s}.sort
 
     registry = service.driver.mapping_registry
 
@@ -103,7 +103,7 @@ class TestUPnPControlService < UPnP::TestCase
   def test_methods
     service = UPnP::Control::Service.new @service_description, @url
 
-    assert_equal @methods, service.methods(false).sort
+    assert_equal @methods, service.methods(false).map{|m| m.to_s}.sort
   end
 
 end

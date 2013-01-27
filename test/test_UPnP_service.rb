@@ -31,8 +31,8 @@ class TestUPnPService < UPnP::TestCase
   def test_actions
     expected = {
       'TestAction' => [
-        %w[in  TestInput  TestInVar],
-        %w[out TestOutput TestOutVar],
+        [:in,  'TestInput',  'TestInVar'],
+        [:out, 'TestOutput', 'TestOutVar'],
       ],
     }
 
