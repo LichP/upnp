@@ -5,7 +5,7 @@ require 'UPnP/SSDP'
 class TestUPnPSSDPSearch < UPnP::TestCase
 
   def test_self_parse_search
-    search = UPnP::SSDP::Search.parse util_search
+    search = UPnP::SSDP::Search.parse util_search, util_host, util_port
 
     assert_equal Time, search.date.class
     assert_equal 'upnp:rootdevice', search.target
@@ -13,7 +13,7 @@ class TestUPnPSSDPSearch < UPnP::TestCase
   end
 
   def test_inspect
-    search = UPnP::SSDP::Search.parse util_search
+    search = UPnP::SSDP::Search.parse util_search, util_host, util_port
 
     id = search.object_id.to_s 16
     expected = "#<UPnP::SSDP::Search:0x#{id} upnp:rootdevice>"

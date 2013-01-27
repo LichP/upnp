@@ -59,30 +59,30 @@ class TestUPnPSSDP < UPnP::TestCase
 
   def test_parse_bad
     assert_raise UPnP::SSDP::Error do
-      @ssdp.parse ''
+      @ssdp.parse '', util_host, util_port
     end
   end
 
   def test_parse_notification
-    notification = @ssdp.parse util_notify
+    notification = @ssdp.parse util_notify, util_host, util_port
 
     assert_equal 'upnp:rootdevice', notification.type
   end
 
   def test_parse_notification_byebye
-    notification = @ssdp.parse util_notify
+    notification = @ssdp.parse util_notify, util_host, util_port
 
     assert_equal 'upnp:rootdevice', notification.type
   end
 
   def test_parse_search
-    response = @ssdp.parse util_search
+    response = @ssdp.parse util_search, util_host, util_port
 
     assert_equal 'upnp:rootdevice', response.target
   end
 
   def test_parse_search_response
-    response = @ssdp.parse util_search_response
+    response = @ssdp.parse util_search_response, util_host, util_port
 
     assert_equal 'upnp:rootdevice', response.target
   end
@@ -247,7 +247,7 @@ USN: #{device.name}::upnp:rootdevice\r
     uri = 'http://127.255.255.255:65536/description'
     device = UPnP::Device.new 'TestDevice', 'test device'
 
-    @ssdp.send_response uri, 'upnp:rootdevice', device.name, device
+    @ssdp.send_response uri, 'upnp:rootdevice', device.name, device, util_host, util_port
 
     search = <<-SEARCH
 HTTP/1.1 200 OK\r
@@ -262,7 +262,7 @@ Content-Length: 0\r
 \r
     SEARCH
 
-    assert_equal [[search, 0, @ssdp.broadcast, @ssdp.port]], socket.sent
+    assert_equal [[search, 0, util_host, util_port]], socket.sent
   end
 
   def test_send_search

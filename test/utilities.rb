@@ -95,6 +95,14 @@ module UPnP
       UPnP::OpenStub::FILES.clear
     end
 
+    def util_host
+      '127.0.0.1'
+    end
+
+    def util_port
+      '23456'
+    end
+
   def util_notify
     <<-NOTIFY
 NOTIFY * HTTP/1.1\r
