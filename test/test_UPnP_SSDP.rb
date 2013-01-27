@@ -289,6 +289,8 @@ ST: bunnies\r
 
     @ssdp.stop_listening
 
+    sleep 1
+
     assert_equal false, thread.alive?
     assert_equal nil, @ssdp.listener
   end
