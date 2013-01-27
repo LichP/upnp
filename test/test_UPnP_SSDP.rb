@@ -247,7 +247,7 @@ USN: #{device.name}::upnp:rootdevice\r
     uri = 'http://127.255.255.255:65536/description'
     device = UPnP::Device.new 'TestDevice', 'test device'
 
-    @ssdp.send_response uri, 'upnp:rootdevice', device.name, device, util_host, util_port
+    @ssdp.send_response uri, 'upnp:rootdevice', device.name, device, util_host, util_port, util_wait_time
 
     search = <<-SEARCH
 HTTP/1.1 200 OK\r
@@ -261,6 +261,8 @@ USN: #{device.name}\r
 Content-Length: 0\r
 \r
     SEARCH
+
+    sleep util_wait_time
 
     assert_equal [[search, 0, util_host, util_port]], socket.sent
   end

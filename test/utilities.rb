@@ -103,6 +103,10 @@ module UPnP
       '23456'
     end
 
+    def util_wait_time
+      2
+    end
+
   def util_notify
     <<-NOTIFY
 NOTIFY * HTTP/1.1\r

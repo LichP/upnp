@@ -290,7 +290,11 @@ class UPnP::SSDP
 
     def self.parse(response, hostname, port)
       response =~ /^mx:\s*(\d+)/i
-      wait_time = Integer $1
+      wait_time = Integer($1 || 1)
+
+      # Ensure wait time is in range 1 to 120 seconds
+      wait_time = 1 if wait_time < 1
+      wait_time = 120 if wait_time > 120
 
       response =~ /^st:\s*(\S*)/i
       target = $1.strip
@@ -461,13 +465,13 @@ class UPnP::SSDP
           devices.each do |d|
             hosts.each do |host|
               uri = "http://#{host}:#{port}/description"
-              send_response uri, search.target, "#{d.name}::#{search.target}", d, search.host, search.port
+              send_response uri, search.target, "#{d.name}::#{search.target}", d, search.host, search.port, search.wait_time
             end
           end
         when 'upnp:rootdevice' then
           hosts.each do |host|
             uri = "http://#{host}:#{port}/description"
-            send_response uri, search.target, "#{root_device.name}::#{search.target}", root_device, search.host, search.port
+            send_response uri, search.target, "#{root_device.name}::#{search.target}", root_device, search.host, search.port, search.wait_time
           end
         else
           warn "Unhandled target #{search.target}"
@@ -718,7 +722,7 @@ USN: #{name}\r
   ##
   # Builds and sends a response to an M-SEARCH request"
 
-  def send_response(uri, type, name, device, host, port)
+  def send_response(uri, type, name, device, host, port, wait_time)
     server_info = "Ruby UPnP/#{UPnP::VERSION}"
     device_info = "#{device.root_device.class}/#{device.root_device.version}"
 
@@ -735,9 +739,17 @@ Content-Length: 0\r
 \r
     HTTP_RESPONSE
 
-    log :debug, "SSDP sent M-SEARCH OK #{type}"
+    # Do waiting and send inside thread to ensure we we don't block while waiting
+    Thread.start do
+      delay_time = rand * wait_time
 
-    @socket.send http_response, 0, host, port
+      log :debug, "SSDP wait M-SEARCH MX #{wait_time}; Delay #{delay_time}"
+
+      sleep(delay_time)
+      @socket.send http_response, 0, host, port
+
+      log :debug, "SSDP sent M-SEARCH OK #{type}; Delay #{delay_time}"
+    end
   end
 
   ##
