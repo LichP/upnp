@@ -5,6 +5,9 @@ require 'soap/filter/handler'
 require 'nokogiri'
 require 'xsd/xmlparser/nokogiri'
 
+# Force recognition of utf-8 - see https://github.com/sparklemotion/nokogiri/issues/822
+Nokogiri::XML::SAX::Parser::ENCODINGS['utf-8'] ||= Nokogiri::XML::SAX::Parser::ENCODINGS['UTF-8']
+
 ##
 # A service contains a SOAP endpoint and the Service Control Protocol
 # Definition (SCPD).  It acts as a SOAP server that is mounted onto the
